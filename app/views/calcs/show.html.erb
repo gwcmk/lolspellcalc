@@ -1,0 +1,21 @@
+<% require 'SpellCalc' %>
+<h2>
+	<%= SpellCalc::DAMAGE_SPELLS.find {|x| x["key"] == @calc.key }["name"] %>
+</h2>
+
+<h4>
+	<%= @calc.description %>
+</h4>
+
+<h4>
+	This spell is the most efficient because, at level 18, with the given inputs, this ability does <%= @calc.damage %> damage
+</h4>
+
+<p>
+<%= link_to "I wrote an \"about\" page explaining my thought process behind this app. Follow this link to read it.", {controller: "pages", action: "about"} %>
+</p>
+
+<%= link_to "Try again?", {controller: "calcs", action: "new"}, class: "btn btn-primary" %> 
+<p>
+note: if you click "Try Again?", refresh the page. For some reason, not all of the CSS loads unless you do...sorry about the inconvenience. Using your browser's back button works as well.
+</p>

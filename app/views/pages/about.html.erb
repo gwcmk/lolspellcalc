@@ -1,0 +1,132 @@
+<h2>About</h2>
+
+<p>Thanks for checking this out! I thought I would write a bit and explain my thought process. I know you're probably busy, so I included a tl;dr at the end if you don't have time to read this whole thing.</p>
+
+<p>Before I start, I want to thank you for this opportunity because it was a lot of fun! This was my first time working with a RESTful API, and I learned a ton of new stuff. Also, it was super interesting to work with the API and see all of the data behind League of Legends.</p>
+
+<p>I used the following open source libraries and frameworks while making this web app. Links to these projects can be found in the Gemfile or application layout.</p>
+
+<ul>
+	<li>Ruby on Rails</li>
+	<li>Bootstrap + Material Design</li>
+	<li>ruby-lol - a Ruby wrapper for the API</li>
+	<li>PostgreSQL</li>
+	<li>jQuery</li>
+  <li>Google Fonts</li>
+	<li>The Riot Games API</li>
+</ul>
+
+<p>"Create a program to calculate the most efficient spell in the game, given varying amounts of ability power, attack damage, and cooldown reduction."</p>
+
+<p>The assignment was extremely open ended, but I wanted to have an empirical method for calculating efficiency. Initially, my plan was to find the best spell based on its team fighting strength. I was going to assign values to stun, slows, and all other CC. However, the more I thought about it, this calculation would be very complex. Here are some of the issues I thought of:</p>
+
+<ul>
+	<li>How many targets did the spell hit? Also, should the targets be assigned values? (i.e. hitting an ADC with CC is much more useful than hitting a tank)</li>
+	<li>How was I going to get CC information from the API? There wasn't an array that stored the "type" of CC, so I would have to find another way.</li>
+	<li>How was I going to value each CC? A knock up is beter than a stun because of interactions with champions like Yasuo, but how do I quantify this difference?</li>
+	<li>Evaluating the value of a single spell is sometimes not properly representing its value. For example, by most metrics, Shaco Q is completely useless, but in reality, a blink that makes you invisble is incredibly valuable.</li>
+</ul>
+
+<p>Given more time, I think I could have worked out solutions to these problems, but in the time I had, I wanted to create something more polished. After thinking that through, I decided to go forward making an app that calculated the damage of all the spells and found the one that did the most damage - most efficiently using the champion's stats to deal damage.</p>
+
+<p>Most of the difficulty implementing the damage calculator was in finding the ratios for spells and factoring that into the total damage. Variables in the format {{ (a/e/f)(1-9) }} had to be parsed to get this information. I implemented a solution using regex matches.</p>
+
+<p>If you go to /services/SpellCalc.rb, you can see the code that does all of the calculations. First, it creates an array with all of the spells in the game that do damage. They were in this format:</p>
+
+<pre>	
+{"name"=&gt;"Summon: Tibbers",
+ "description"=&gt;
+  "Annie wills her bear Tibbers to life, dealing damage to units in the area. Tibbers can attack and also burns enemies that stand near him.",
+ "sanitizedDescription"=&gt;
+  "Annie wills her bear Tibbers to life, dealing damage to units in the area. Tibbers can attack and also burns enemies that stand near him.",
+ "tooltip"=&gt;
+  "Tibbers appears in a burst of flame dealing {{ e1 }} &lt;span class=\"color99FF99\"&gt;(+{{ a1 }})&lt;/span&gt; magic damage to enemies in the target area.&lt;br&gt;&lt;br&gt;For the next {{ e6 }} seconds, Tibbers chases down enemies and deals {{ e4 }}&lt;span class=\"color99FF99\"&gt; (+{{ a2 }})&lt;/span&gt; magic damage each second to nearby foes.&lt;br&gt;&lt;br&gt;&lt;span class=\"color99FF99\"&gt;Tibbers can be controlled by holding the alt key and using the right mouse button or by reactivating this ability.&lt;/span&gt;",
+ "sanitizedTooltip"=&gt;
+  "Tibbers appears in a burst of flame dealing {{ e1 }} (+{{ a1 }}) magic damage to enemies in the target area. For the next {{ e6 }} seconds, Tibbers chases down enemies and deals {{ e4 }} (+{{ a2 }}) magic damage each second to nearby foes. Tibbers can be controlled by holding the alt key and using the right mouse button or by reactivating this ability.",
+ "leveltip"=&gt;
+  {"label"=&gt;
+    ["Damage",
+     "Tibbers Health",
+     "Tibbers Armor and Magic Resist",
+     "Tibbers Attack Damage",
+     "Cooldown"],
+   "effect"=&gt;
+    ["{{ e1 }} -&gt; {{ e1NL }}",
+     "{{ e2 }} -&gt; {{ e2NL }}",
+     "{{ e5 }} -&gt; {{ e5NL }}",
+     "{{ e3 }} -&gt; {{ e3NL }}",
+     "{{ cooldown }} -&gt; {{ cooldownnNL }}"]},
+ "image"=&gt;
+  {"full"=&gt;"InfernalGuardian.png",
+   "sprite"=&gt;"spell1.png",
+   "group"=&gt;"spell",
+   "x"=&gt;0,
+   "y"=&gt;0,
+   "w"=&gt;48,
+   "h"=&gt;48},
+ "resource"=&gt;"{{ cost }} Mana",
+ "maxrank"=&gt;3,
+ "cost"=&gt;[100, 100, 100],
+ "costType"=&gt;"Mana",
+ "costBurn"=&gt;"100",
+ "cooldown"=&gt;[120.0, 100.0, 80.0],
+ "cooldownBurn"=&gt;"120/100/80",
+ "effect"=&gt;
+  [nil,
+   [175.0, 300.0, 425.0],
+   [1200.0, 2100.0, 3000.0],
+   [80.0, 105.0, 130.0],
+   [35.0, 35.0, 35.0],
+   [30.0, 50.0, 70.0],
+   [45.0, 45.0, 45.0]],
+ "effectBurn"=&gt;
+  ["", "175/300/425", "1200/2100/3000", "80/105/130", "35", "30/50/70", "45"],
+ "vars"=&gt;
+  [{"key"=&gt;"a1", "link"=&gt;"spelldamage", "coeff"=&gt;[0.8]},
+   {"key"=&gt;"a2", "link"=&gt;"spelldamage", "coeff"=&gt;[0.2]}],
+ "range"=&gt;[600, 600, 600],
+ "rangeBurn"=&gt;"600",
+ "key"=&gt;"InfernalGuardian",
+ "altimages"=&gt;
+  [{"full"=&gt;"InfernalGuardian0.png",
+    "sprite"=&gt;"spell1.png",
+    "group"=&gt;"spell",
+    "x"=&gt;48,
+    "y"=&gt;0,
+    "w"=&gt;48,
+    "h"=&gt;48}]}
+</pre>
+
+<p>Then, the relevant information was parsed and put into an array called DS_INFO. They were stored in this format:</p>
+
+<pre>	
+{"key"=&gt;"InfernalGuardian",
+ "base_damage"=&gt;425.0,
+ "cooldown"=&gt;80.0,
+ "ratio"=&gt;[0.8],
+ "ratio_type"=&gt;["spelldamage"],
+ "ult?"=&gt;"yes"}
+
+</pre>
+
+<p>I also added support for abilities with multiple ratios, such as Katarina's ultimate.</p>
+
+<pre>	
+{"key"=&gt;"KatarinaR",
+ "base_damage"=&gt;750.0,
+ "cooldown"=&gt;45.0,
+ "ratio"=&gt;[3.75, 2.5],
+ "ratio_type"=&gt;["bonusattackdamage", "spelldamage"],
+ "ult?"=&gt;"yes"}
+
+</pre>
+
+<p>With the DS_INFO array set up, the most efficient ability can be calculated. get_damage is "where the magic happens." Based on the information stored in the hash as well as the user inputs, it calculates the damage. Then, in get_max, it keeps track of the spell with the maximum damage. Finally, in the CalcsController, it returns the most efficient spell to the user in the "show" action.</p>
+
+<p>At this point, I started to thoroughly test it, and unfortunately, I found some issues. Some of the spells did not follow the conventions that I had found in the API, and it was causing problems with the calculations. For example, Nasus Q has a reference to @stacks. While it's obvious to a League player what that means, it's hard to account for all of these fringe cases. I list all of the abilities with these kinds of issues in SpellCalc.rb. Rather than clutter my code with about 20 if statements, I made the decision to only include the spells that follow the standard format. I truly don't think any of those spells would have been considered the most efficient, except for Ezreal's Q in a team fight. Given more time, I am confident that I could find an elegant solution.</p>
+
+<p>With that done, I decided to add two extra features for fun. I was noticing that, unsurprisingly, ultimates were usually the most efficient spells. Out of curiousity, I added an option to only include non-ultimate spells. I also figured that lower cooldown spells would perform better in extended fights, so I added the "scenario" option, which defines the length of the fight. A duel is a single use of the spell (0 seconds). A skirmish/gank is 10 seconds, and an extended team fight is 30 seconds.</p>
+
+<p><strong>TL;DR</strong> I spent many hours programming an app that calculates the damage of spells with variable inputs. Also, the following paragraph:</p>
+
+<p>Hopefully, if anything, I showed that I have a genuine interest for both coding and League of Legends. Although it sounds clich&eacute;, working at Riot Games next summer would honestly be a dream come true. I truly believe that I have the skills and work ethic to be a helpful member of the team. Thanks again for the opportunity, and I hope to hear back from you soon!</p>

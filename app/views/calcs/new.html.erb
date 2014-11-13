@@ -1,0 +1,23 @@
+<% if flash[:notice] %>
+	<div class="alert alert-dismissable alert-danger"><%= flash[:notice] %></div>
+<% end %>
+
+<h2>What is the most efficient spell with the following inputs?</h2>
+
+<p>Some quick guidelines:</p>
+<ul>
+	<li>Fill out every field.</li>
+	<li>The max AD is 1499.70 <a href="http://leagueoflegends.wikia.com/wiki/Attack_damage#Trivia" class="href" target="_blank">Source</a></li>
+	<li>The max AP is 1729.886 <a href="http://leagueoflegends.wikia.com/wiki/Ability_power#Trivia" class="href" target="_blank">Source</a></li>
+	<li>The max CDR is 40</li>
+</ul>
+
+<p>If you don't follow these rules, it will not calculate a result and redirect you back to this page. Also, if you're not using a modern browser like Chrome or Firefox, this page may not load correctly.</p>
+
+<p>
+<%= link_to "I wrote an \"about\" page explaining my thought process behind this app. Follow this link to read it.", {controller: "pages", action: "about"} %>
+</p>
+
+<%= form_for @calc, html: {role: "form"} do |f| %>
+	<%= render(:partial => "form", :locals => {:f => f}) %>
+<% end %>
