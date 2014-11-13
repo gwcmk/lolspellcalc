@@ -1,28 +1,7 @@
 == README
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+This app is running here: {https://blooming-ridge-6911.herokuapp.com/}[https://blooming-ridge-6911.herokuapp.com/]
 
-Things you may want to cover:
+See more detailed information about it here: {https://blooming-ridge-6911.herokuapp.com/pages/about}[https://blooming-ridge-6911.herokuapp.com/pages/about]
 
-* Ruby version
-
-* System dependencies
-
-* Configuration
-
-* Database creation
-
-* Database initialization
-
-* How to run the test suite
-
-* Services (job queues, cache servers, search engines, etc.)
-
-* Deployment instructions
-
-* ...
-
-
-Please feel free to use a different markup language if you do not plan to run
-<tt>rake doc:app</tt>.
+If you want to run this locally, you need to get an API key here: {https://developer.riotgames.com/}[https://developer.riotgames.com/], and put it in services/SpellCalc.rb
