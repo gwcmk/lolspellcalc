@@ -1,3 +1,3 @@
 == README
 
-If you want to run this locally, you need to get an API key here: {https://developer.riotgames.com/}[https://developer.riotgames.com/], and put it in services/SpellCalc.rb
+If you want to run this locally, you need to get an API key here: {https://developer.riotgames.com/}[https://developer.riotgames.com/], and put it in app/services/SpellCalc.rb
